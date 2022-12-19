@@ -1,0 +1,47 @@
+version: '3.8'
+
+# Define services
+services:
+    # App Service
+    backend_app:
+        container_name: explore_devops
+         # Configuration for building the docker image for the service
+        build:
+            # Use an image built from the specified dockerfile in the current directory.
+            context: .
+            dockerfile: Dockerfile
+        ports:
+            # Forward the exposed port 8080 on the container to port 8080 on the host machine
+            - '8080:8080'
+        restart: on-failure
+        depends_on:
+            # This service depends on postgres db. Start that first.
+            - db
+        # Networks to join (Services on the same network can communicate with each other using their name)
+        networks:
+            - backend
+
+    db:
+        container_name: postgres_db
+        image: postgres:15.1
+        volumes:
+            - ./sql:/docker-entrypoint-initdb.d
+        restart: on-failure
+        # Pass environment variables to the service
+        environment:
+            - POSTGRES_USER=${DB_USER} 
+            - POSTGRES_PASSWORD=${DB_PASSWORD}
+            - POSTGRES_DB=${DB_NAME}
+            - DATABASE_HOST=${DB_HOST} # Change the DB_HOST in .env file when running the app in docker container
+        ports:
+            - '5432:5432'
+        networks:
+            - backend
+
+volumes:
+    postgres_data:
+
+networks:
+    backend:
+        driver: bridge
+    

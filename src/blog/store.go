@@ -1,28 +1,26 @@
 package blog
 
-import(
+import (
 	"database/sql"
-	_ "github.com/lib/pq"
-	"log"
 	"fmt"
-)
+	"log"
+	"os"
 
-const (
-	DB_HOST     = "localhost"
-	DB_PORT     = 5432
-    DB_USER     = "postgres"
-    DB_PASSWORD = "123456789"
-    DB_NAME     = "blog_demo"
+	"github.com/joho/godotenv"
+	_ "github.com/lib/pq"
 )
 
 var db *sql.DB
 
-// InitDB  sets up DB
 func InitDB() {
-	var err error
+	// load .env file
+	err := godotenv.Load(".env")
+	if err != nil {
+		log.Fatalf("[InitDB] Error loading .env file")
+	}
 
-    dbinfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME)
-    db, err = sql.Open("postgres", dbinfo)
+	dbinfo := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", os.Getenv("DB_HOST"), os.Getenv("DB_PORT"), os.Getenv("DB_USER"), os.Getenv("DB_PASSWORD"), os.Getenv("DB_NAME"))
+	db, err = sql.Open("postgres", dbinfo)
 	if err != nil {
 		log.Printf("[initDB] error initializing postgres db - %s\n", err.Error())
 		log.Fatal("Failure while connecting to slave", err)
@@ -31,7 +29,7 @@ func InitDB() {
 
 //StoreArticle func stores article in db
 var StoreArticle = func(article Article) error {
-	storeArticleQuery := `INSERT into articles (author, title, content) VALUES ($1, $2, $3)` 
+	storeArticleQuery := `INSERT into articles (author, title, content) VALUES ($1, $2, $3)`
 
 	_, err := db.Exec(storeArticleQuery, article.Author, article.Title, article.Content)
 	if err != nil {
@@ -44,12 +42,12 @@ var StoreArticle = func(article Article) error {
 //RetrieveAllArticles func retrieves articles from db
 var RetrieveAllArticles = func() ([]Article, error) {
 	rows, err := db.Query("select author, title, content from articles")
-	if err != nil{
+	if err != nil {
 		return []Article{}, err
 	}
 
 	var articles []Article
-	for rows.Next(){
+	for rows.Next() {
 		var author, title, content string
 
 		err = rows.Scan(&author, &title, &content)
@@ -57,7 +55,7 @@ var RetrieveAllArticles = func() ([]Article, error) {
 			return articles, err
 		}
 
-		articles = append(articles, Article{Author: author, Title : title, Content: content})
+		articles = append(articles, Article{Author: author, Title: title, Content: content})
 	}
 
 	return articles, nil

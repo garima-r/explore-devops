@@ -11,8 +11,6 @@ import (
 )
 
 func main() {
-	fmt.Println("Good to Go!")
-
 	//Postgres DB initialization
 	blog.InitDB()
 
