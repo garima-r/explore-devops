@@ -23,9 +23,8 @@ jobs:
       # golint  is concerned with coding style.
       - name: Golint
         run: |
-          export PATH=$PATH:$(go env GOPATH)/bin
-          go get -u golang.org/x/lint/golint
-          make lint
+          go install golang.org/x/lint/golint@latest
+          golint ./...
       - name: Build
         run: go build -v ./...
       - name: Run tests
