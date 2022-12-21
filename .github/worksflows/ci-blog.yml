@@ -2,7 +2,8 @@ name: blog-pipeline
 
 on:
   push:
-    branches: [master]
+    branches:
+      - master
 
 jobs:
   build_and_test:
