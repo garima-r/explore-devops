@@ -3,8 +3,7 @@ on:
   push:
     branches:
       - master
-    paths:
-      - .github/workflows/ci-blog.yaml
+
 jobs:
   build_and_test:
     runs-on: ubuntu-latest
