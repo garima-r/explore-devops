@@ -1,39 +1,33 @@
 name: blog-pipeline
-
 on:
   push:
     branches:
       - master
-
+    paths:
+      - .github/workflows/ci-blog.yaml
 jobs:
   build_and_test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: action/checkout@v3
-      
       - name: Setup GO
         uses: actions/setup-go@v3
         with: 
           go-version: 1.16
           cache: true
-
       - name: Verify dependencies
         run: go mod verify
-
       #vet is a tool that checks correctness of Go programs; examines Go source code and reports suspicious constructs.
       - name: Vet
         run: go vet ./...
-      
       # golint  is concerned with coding style.
       - name: Golint
         run: |
           export PATH=$PATH:$(go env GOPATH)/bin
           go get -u golang.org/x/lint/golint
           make lint
-
       - name: Build
         run: go build -v ./...
-
       - name: Run tests
         run: go test -v ./...
