@@ -66,9 +66,15 @@ jobs:
           command: go build -v ./...
 
 workflows:
-  ci:
+  build_and_test:
     jobs:
-      - test
+      - test:
+          filters: &filters-staging # this yaml anchor is setting these values to "filters-staging"
+            branches:
+              only:
+                - staging
       - build:
           requires:
             - test
+          filters:
+            <<: *filters-staging # this is calling the previously set yaml anchor
