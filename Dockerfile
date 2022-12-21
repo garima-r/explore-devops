@@ -4,7 +4,7 @@
 FROM golang:1.16-alpine as base
  
 #Adding Maintainer info
-LABEL maintainer = "Garima Rawat <graw3.14@gmail.com>"
+LABEL maintainer = "Garima Rawat"
 
 #Installing git.
 #Git is required for fetching the dependencies
