@@ -1,0 +1,74 @@
+# using the latest 2.1 version of CircleCI pipeline process
+# check here : https://circleci.com/docs/configuration-reference/
+
+version: 2.1
+jobs:
+  test:
+    working_directory: ~/repo
+    docker:
+      - image: circleci/golang:1.16
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - go-mod-v4-{{ checksum "go.sum" }}
+      - run:
+          name: Install Dependencies
+          command: go mod download
+      - save_cache:
+          key: go-mod-v4-{{ checksum "go.sum" }}
+          paths:
+            - "/go/pkg/mod"
+      - run:
+          name: Run gofmt
+          command: gofmt
+      - run:
+          name: Run go vet
+          command: go vet -v ./...
+      - run:
+          name: Run golint
+          command: |
+            go get -u golang.org/x/lint/golint
+            golint ./...
+      - run:
+          name: Run unit tests
+          command: go test -v ./...
+
+  build:
+    working_directory: ~/repo
+    docker:
+      - image: circleci/golang:1.16
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - go-mod-v4-{{ checksum "go.sum" }}
+      - run:
+          name: Install Dependencies
+          command: go mod download
+      - save_cache:
+          key: go-mod-v4-{{ checksum "go.sum" }}
+          paths:
+            - "/go/pkg/mod"
+      - run:
+          name: Run gofmt
+          command: gofmt
+      - run:
+          name: Run go vet
+          command: go vet -v ./...
+      - run:
+          name: Run golint
+          command: |
+            go get -u golang.org/x/lint/golint
+            golint ./...
+      - run:
+          name: Execute build
+          command: go build -v ./...
+
+workflows:
+  ci:
+    jobs:
+      - test
+      - build:
+          requires:
+            - test
