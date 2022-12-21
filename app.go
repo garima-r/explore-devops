@@ -23,4 +23,6 @@ func main() {
 	// serve the app
 	fmt.Println("Server at 8080")
 	log.Fatal(http.ListenAndServe(":8080", router))
+
+	log.Println("test github action workflow")
 }
